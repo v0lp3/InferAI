@@ -91,8 +91,8 @@ def analyze(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: bytes)
                     delivery_mode=2,
                 ),
             )
-    except:
-        logging.error(f"Failed to analyze {message}")
+    except Exception as e:
+        logging.error(f"Failed to analyze {message}, {e}")
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
