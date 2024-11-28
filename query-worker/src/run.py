@@ -1,9 +1,12 @@
 import json
 import logging
-import google.generativeai as genai
+
+# import google.generativeai as genai
+from groq import Groq
+
 
 from time import sleep, time
-from definitions import GEMINI_TOKEN, INSTRUCTION, RABBITMQ_CREDENTIALS, Error
+from definitions import GROQ_TOKEN, INSTRUCTION, RABBITMQ_CREDENTIALS, Error
 from pika import (
     BasicProperties,
     BlockingConnection,
@@ -18,13 +21,14 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(module)s %(funcName)s %(message)s",
 )
 
-genai.configure(api_key=GEMINI_TOKEN)
-
+client = Groq(
+    api_key=GROQ_TOKEN,
+)
 
 errors = Error(0, 0)
 
 
-def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: bytes):
+def query_llm(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: bytes):
     global errors
 
     message = json.loads(body)
@@ -38,8 +42,16 @@ def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
         return
 
     try:
-        response = model.generate_content(
-            INSTRUCTION + "\n```c\n" + message["prompt"] + "```"
+        prompt = INSTRUCTION + "\n```c\n" + message["prompt"] + "```"
+
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model="llama-3.1-70b-versatile",
         )
 
         errors = Error(0, timestamp)
@@ -47,7 +59,12 @@ def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
         to_ack = True
 
         try:
-            message["response"] = response.text.split("```c\n")[1].split("```")[0]
+            message["response"] = (
+                chat_completion.choices[0]
+                .message.content.split("```c\n")[1]
+                .split("```")[0]
+            )
+            message["status"] = 200
 
             ch.basic_publish(
                 exchange="",
@@ -74,7 +91,6 @@ def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
         logging.info(f"API error")
 
 
-model = genai.GenerativeModel("gemini-pro")
 credentials = PlainCredentials(*RABBITMQ_CREDENTIALS)
 parameters = ConnectionParameters(
     "rabbitmq",
@@ -94,7 +110,7 @@ ch.queue_declare(queue="query-jobs", durable=True, auto_delete=False)
 
 ch.basic_consume(
     queue="query-jobs",
-    on_message_callback=query_gemini,
+    on_message_callback=query_llm,
 )
 
 ch.start_consuming()

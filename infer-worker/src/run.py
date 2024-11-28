@@ -14,7 +14,12 @@ from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
 from contextualizer import ContextParser
-from definitions import RABBITMQ_CREDENTIALS, STATUS_NO_VULN_FOUND, STATUS_REPO_NOT_FOUND, STATUS_OK
+from definitions import (
+    RABBITMQ_CREDENTIALS,
+    STATUS_NO_VULN_FOUND,
+    STATUS_REPO_NOT_FOUND,
+    STATUS_OK,
+)
 from infer import Infer, InferReport
 
 logging.basicConfig(
@@ -51,7 +56,7 @@ def analyze(
             "id": id,
             "status": STATUS_REPO_NOT_FOUND,
         }
-        
+
         ch.basic_publish(
             routing_key="patch-jobs",
             exchange="",
@@ -80,7 +85,7 @@ def analyze(
             "id": id,
             "status": STATUS_NO_VULN_FOUND,
         }
-        
+
         ch.basic_publish(
             routing_key="patch-jobs",
             exchange="",
@@ -187,7 +192,7 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
 
         with open(status_dir, "w") as f:
             f.write(str(status))
-        
+
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 

@@ -142,17 +142,15 @@ def view() -> Response:
             except Exception as e:
                 logging.info(e)
                 return "Error", 500
-            
+
         elif os.path.exists(status_path):
             with open(status_path) as f:
                 status = f.read()
-            
+
             return status, 200
 
         else:
             return "Analysis in progress", 200
-
-        
 
 
 logging.basicConfig(

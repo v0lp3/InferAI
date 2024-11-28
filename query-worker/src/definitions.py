@@ -2,18 +2,13 @@ from os import environ
 from collections import namedtuple
 
 rabbitmq_pass_filepath = environ.get("RABBITMQ_DEFAULT_PASS_FILE")
-gemini_token_filepath = environ.get("GEMINI_TOKEN_FILE")
-http_proxy_filepath = environ.get("HTTP_PROXY_FILE")
+groq_token_filepath = environ.get("GROQ_TOKEN_FILE")
 
 with open(rabbitmq_pass_filepath, "r") as f:
     RABBITMQ_PASSWORD = f.read().strip()
 
-with open(gemini_token_filepath, "r") as f:
-    GEMINI_TOKEN = f.read().strip()
-
-with open(http_proxy_filepath, "r") as f:
-    proxy = f.read().strip()
-    environ["http_proxy"] = proxy
+with open(groq_token_filepath, "r") as f:
+    GROQ_TOKEN = f.read().strip()
 
 RABBITMQ_CREDENTIALS = (environ.get("RABBITMQ_USER", "user"), RABBITMQ_PASSWORD)
 
