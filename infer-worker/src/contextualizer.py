@@ -1,8 +1,9 @@
 import difflib
 import logging
 
-from infer import InferReport
 from tree_sitter import Language, Node, Parser, Tree
+
+from infer import InferReport
 
 
 class LanguageParser:
@@ -67,6 +68,9 @@ class LanguageParser:
 class ContextParser:
     @staticmethod
     def update_procedures_line(reports: list[InferReport]):
+        """
+        This function is used to get the line number of the function where the bug was found.
+        """
         language_parser = LanguageParser()
 
         for i, report in enumerate(reports):

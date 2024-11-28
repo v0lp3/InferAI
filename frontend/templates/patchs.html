@@ -1,20 +1,24 @@
 <html>
     <head>
-        <title>Infer Pro</title>
+        <title>Infer AI</title>
         <link rel="stylesheet" href="static/style.css">
 
     </head>
     <body>
         <div>
             <div style="width: 500px; margin-bottom: 20px;">
-                <h1>Infer Pro</h1>
+                <h1>Infer AI</h1>
                 <h3><a href="/">Scan new repository</a> or <a href="/patchs">view your past scans</a></h3>
             </div>
             
             <form action="/patchs" method="POST">
-            {% for patch in patchs %}
-                <input style="margin-bottom: 10px;" type="submit" name="id" value="{{ patch }}">
-            {% endfor %}                
+            {% if patchs %}
+                {% for patch in patchs %}
+                    <input style="margin-bottom: 10px;" type="submit" name="id" value="{{ patch }}">
+                {% endfor %}
+            {% else %}
+                <p>There are no patches available. Try to analyze something!</p>
+            {% endif %}           
             </form>
         </div>
     </body>
