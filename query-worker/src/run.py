@@ -23,6 +23,7 @@ genai.configure(api_key=GEMINI_TOKEN)
 
 errors = Error(0, 0)
 
+
 def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: bytes):
     global errors
 
@@ -67,10 +68,11 @@ def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
             ch.basic_ack(delivery_tag=method.delivery_tag)
     except:
         sleep(15)
-        
-        errors = Error(errors.count + 1, timestamp) 
+
+        errors = Error(errors.count + 1, timestamp)
 
         logging.info(f"API error")
+
 
 model = genai.GenerativeModel("gemini-pro")
 credentials = PlainCredentials(*RABBITMQ_CREDENTIALS)

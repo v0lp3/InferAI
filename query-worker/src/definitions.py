@@ -13,12 +13,9 @@ with open(gemini_token_filepath, "r") as f:
 
 with open(http_proxy_filepath, "r") as f:
     proxy = f.read().strip()
-    environ['http_proxy'] = proxy
+    environ["http_proxy"] = proxy
 
-RABBITMQ_CREDENTIALS = (
-    environ.get("RABBITMQ_USER", "user"),
-    RABBITMQ_PASSWORD
-)
+RABBITMQ_CREDENTIALS = (environ.get("RABBITMQ_USER", "user"), RABBITMQ_PASSWORD)
 
 INSTRUCTION = """Task: Replace the suggested [Unsafe] C code function to improve its security.
 

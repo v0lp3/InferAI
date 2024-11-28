@@ -9,7 +9,4 @@ with open(rabbitmq_pass_filepath, "r") as f:
 with open(flask_secret_key_filepath, "r") as f:
     FLASK_SECRET_KEY = f.read().strip()
 
-RABBITMQ_CREDENTIALS = (
-    environ.get("RABBITMQ_USER", "user"),
-    RABBITMQ_PASSWORD
-)
+RABBITMQ_CREDENTIALS = (environ.get("RABBITMQ_USER", "user"), RABBITMQ_PASSWORD)
