@@ -19,7 +19,7 @@ from pika.spec import BasicProperties
 app = Flask(__name__, static_folder="../static", template_folder="../templates")
 
 
-def get_ids() -> list[str]:
+def get_analyzed_files_ids() -> list[str]:
     """
     Retrieves the list of file IDs previously analyzed by the application, stored in a cookie.
 
@@ -75,7 +75,7 @@ def analyze() -> Response:
         "id": id,
     }
 
-    ids: list[str] = get_ids() + [id]
+    ids: list[str] = get_analyzed_files_ids() + [id]
 
     token: str = jwt.encode({"ids": ids}, app.secret_key, algorithm="HS256")
 
@@ -85,7 +85,7 @@ def analyze() -> Response:
     try:
         ch.basic_publish(
             exchange="",
-            routing_key="analyzing",
+            routing_key="analyze-jobs",
             body=json.dumps(data),
             properties=BasicProperties(
                 delivery_mode=2,
@@ -118,7 +118,7 @@ def view() -> Response:
             - Returns a 500 response if an error occurs during file packaging.
     """
 
-    ids: list[str] = get_ids()
+    ids: list[str] = get_analyzed_files_ids()
 
     if request.method == "GET":
         return render_template("patchs.html", patchs=ids)
@@ -129,17 +129,30 @@ def view() -> Response:
             return "Invalid request", 400
 
         patchs_path: str = os.path.join("/storage", id, "patchs")
+        status_path: str = os.path.join("/storage", id, "status")
 
         timestamp: int = int(time())
         output_file: str = os.path.join("/tmp", f"patchs_{id}_{timestamp}")
 
-        try:
-            shutil.make_archive(output_file, "zip", patchs_path)
-            return send_file(f"{output_file}.zip", as_attachment=True)
+        if os.path.exists(patchs_path):
+            try:
+                shutil.make_archive(output_file, "zip", patchs_path)
+                return send_file(f"{output_file}.zip", as_attachment=True)
 
-        except Exception as e:
-            logging.info(e)
-            return "Error", 500
+            except Exception as e:
+                logging.info(e)
+                return "Error", 500
+            
+        elif os.path.exists(status_path):
+            with open(status_path) as f:
+                status = f.read()
+            
+            return status, 200
+
+        else:
+            return "Analysis in progress", 200
+
+        
 
 
 logging.basicConfig(

@@ -15,8 +15,7 @@ RUN apt-get update && \
       git \
       openssh-client
 
-# Download the Infer release
-RUN INFER_VERSION=v1.1.0; \
+RUN INFER_VERSION=v1.2.0; \
     cd /opt && \
     curl -sL \
       https://github.com/facebook/infer/releases/download/${INFER_VERSION}/infer-linux64-${INFER_VERSION}.tar.xz | \
@@ -24,11 +23,12 @@ RUN INFER_VERSION=v1.1.0; \
     rm -f /infer && \
     ln -s ${PWD}/infer-linux64-$INFER_VERSION /infer
 
-RUN pip install tree_sitter==0.21.0 GitPython==3.1.42 pika==1.3.1
+WORKDIR /infer-worker
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 ENV PATH /infer/bin:${PATH}
-
-WORKDIR /infer-worker
 
 COPY . .
 

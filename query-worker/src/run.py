@@ -51,7 +51,7 @@ def query_gemini(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
 
             ch.basic_publish(
                 exchange="",
-                routing_key="patching",
+                routing_key="patch-jobs",
                 body=json.dumps(message),
                 properties=BasicProperties(
                     delivery_mode=2,
@@ -90,10 +90,10 @@ ch = cn.channel(1337)
 
 ch.basic_qos()
 
-ch.queue_declare(queue="querying", durable=True, auto_delete=False)
+ch.queue_declare(queue="query-jobs", durable=True, auto_delete=False)
 
 ch.basic_consume(
-    queue="querying",
+    queue="query-jobs",
     on_message_callback=query_gemini,
 )
 

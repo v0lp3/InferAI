@@ -6,6 +6,7 @@ services:
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    entrypoint: "sh -c 'RABBITMQ_DEFAULT_PASS=$(cat /run/secrets/rabbitmq_password) exec docker-entrypoint.sh rabbitmq-server'"
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 15s
