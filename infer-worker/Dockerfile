@@ -15,7 +15,7 @@ RUN apt-get update && \
       git \
       openssh-client
 
-RUN INFER_VERSION=v1.2.0; \
+RUN INFER_VERSION=v1.1.0; \
     cd /opt && \
     curl -sL \
       https://github.com/facebook/infer/releases/download/${INFER_VERSION}/infer-linux64-${INFER_VERSION}.tar.xz | \
@@ -24,7 +24,7 @@ RUN INFER_VERSION=v1.2.0; \
     ln -s ${PWD}/infer-linux64-$INFER_VERSION /infer
 
 WORKDIR /infer-worker
-
+  
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
