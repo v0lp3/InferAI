@@ -30,6 +30,7 @@ git clone https://github.com/v0lp3/InferAI.git
 Set the required tokens:
 
 ```bash
+cd InferAI
 mkdir secrets
 cd secrets
 echo "YOUR_GROQ_TOKEN" > groq_token.txt
