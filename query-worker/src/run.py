@@ -1,12 +1,10 @@
 import json
 import logging
+from time import sleep, time
 
-# import google.generativeai as genai
+from definitions import GROQ_TOKEN, INSTRUCTION, RABBITMQ_CREDENTIALS, Error
 from groq import Groq
 
-
-from time import sleep, time
-from definitions import GROQ_TOKEN, INSTRUCTION, RABBITMQ_CREDENTIALS, Error
 from pika import (
     BasicProperties,
     BlockingConnection,
