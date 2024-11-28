@@ -1,5 +1,7 @@
 # InferAI
 
+![inferai](docs/inferai_screenshot.png)
+
 **InferAI** is an experiment tool designed to automatically generate patches for security vulnerabilities identified by the [Infer Static Analyzer](https://github.com/facebook/infer) through the use of LLMs. This project was developed as part of the Ingegneria dei Sistemi Distribuiti course at the University of Catania (UNICT), with the goal of bridging the gap between vulnerability detection and resolution.
 
 The project is intended as a conceptual tool to explore automation in vulnerability patching. While it provides insights into the potential of such tools, InferAI is not designed for production use or highly complex projects.
