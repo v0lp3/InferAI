@@ -1,17 +1,15 @@
-FROM debian:bullseye-slim
-
-RUN apt-get update && \
-    mkdir -p /usr/share/man/man1 && \
-    apt-get install -y \
-      curl \
-      python3 \
-      python3-pip \
-      git
-
-
-RUN pip install pika flask pyjwt
+FROM python:3.12.2  
 
 WORKDIR /app
+
+RUN apt update && apt install -y --no-install-recommends \
+    git \
+    curl \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
