@@ -12,9 +12,13 @@
             </div>
             
             <form action="/patchs" method="POST">
-            {% for patch in patchs %}
-                <input style="margin-bottom: 10px;" type="submit" name="id" value="{{ patch }}">
-            {% endfor %}                
+            {% if patchs %}
+                {% for patch in patchs %}
+                    <input style="margin-bottom: 10px;" type="submit" name="id" value="{{ patch }}">
+                {% endfor %}
+            {% else %}
+                <p>There are no patches available. Try to analyze something!</p>
+            {% endif %}           
             </form>
         </div>
     </body>
