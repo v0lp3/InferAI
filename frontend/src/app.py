@@ -2,7 +2,7 @@ import json
 import logging
 import os.path
 import secrets
-import shutil
+import zipfile
 import jwt
 
 from time import time
@@ -108,7 +108,7 @@ def view() -> Response:
         Renders a template `patchs.html` with a list of available patch IDs for analyzed files.
 
     - On a `POST` request:
-        Processes a form submission containing an `id` to download  the patch.
+        Processes a form submission containing an `id` to download the patch.
 
     Returns:
         Response:
@@ -117,40 +117,51 @@ def view() -> Response:
             - Returns a 400 response for invalid IDs.
             - Returns a 500 response if an error occurs during file packaging.
     """
-
     ids: list[str] = get_analyzed_files_ids()
 
     if request.method == "GET":
         return render_template("patchs.html", patchs=ids)
-    else:
-        id: str = request.form.get("id")
 
-        if id not in ids:
-            return "Invalid request", 400
+    id: str = request.form.get("id")
 
-        patchs_path: str = os.path.join("/storage", id, "patchs")
-        status_path: str = os.path.join("/storage", id, "status")
+    if id not in ids:
+        return "Invalid request", 400
 
-        timestamp: int = int(time())
-        output_file: str = os.path.join("/tmp", f"patchs_{id}_{timestamp}")
+    job_path = os.path.join("/storage", id)
+    patchs_path = os.path.join(job_path, "patchs")
+    status_path = os.path.join(job_path, "status")
 
-        if os.path.exists(patchs_path):
-            try:
-                shutil.make_archive(output_file, "zip", patchs_path)
-                return send_file(f"{output_file}.zip", as_attachment=True)
+    if os.path.exists(patchs_path):
+        timestamp = int(time())
+        output_file = os.path.join("/tmp", f"patchs_{id}_{timestamp}.zip")
 
-            except Exception as e:
-                logging.info(e)
-                return "Error", 500
+        try:
+            with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
 
-        elif os.path.exists(status_path):
-            with open(status_path) as f:
-                status = f.read()
+                for file in os.listdir(job_path):
+                    if file.endswith(".json"):
+                        zipf.write(
+                            os.path.realpath(os.path.join(job_path, file)),
+                            arcname=file,
+                        )
 
-            return status, 200
+                for root, _, files in os.walk(patchs_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, patchs_path)
+                        zipf.write(file_path, arcname=arcname)
 
-        else:
-            return "Analysis in progress", 200
+            return send_file(output_file, as_attachment=True)
+
+        except Exception as e:
+            logging.error(f"Error while creating ZIP: {e}")
+            return "Error", 500
+
+    if os.path.exists(status_path):
+        with open(status_path) as f:
+            return f.read(), 200
+
+    return "Analysis in progress", 200
 
 
 logging.basicConfig(

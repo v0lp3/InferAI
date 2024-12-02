@@ -30,6 +30,23 @@ logging.basicConfig(
 )
 
 
+def save_bug_count_report(
+    path: str, description, vulnerabilities: list[InferReport]
+) -> None:
+    bugs_report = dict()
+
+    bugs_report["description"] = description
+    bugs_report["bugs"] = dict()
+
+    for vuln in vulnerabilities:
+        bugs_report["bugs"][vuln.bug_type] = (
+            bugs_report["bugs"].get(vuln.bug_type, 0) + 1
+        )
+
+    with open(path, "w") as f:
+        f.write(json.dumps(bugs_report))
+
+
 def analyze(
     ch: Channel, method: Basic.Deliver, _: BasicProperties, body: bytes
 ) -> None:
@@ -73,18 +90,19 @@ def analyze(
 
             ContextParser.update_procedures_line(vulnerabilities)
 
-            unique_procedures = set()
-            bugs_count = dict()
+            save_bug_count_report(
+                os.path.join(job_path, "original_bugs_count.json"),
+                "All original bugs found",
+                vulnerabilities,
+            )
 
-            for vuln in vulnerabilities:
-                unique_procedures.add((vuln.source_path, vuln.procedure_line))
-                bugs_count[vuln.bug_type] = bugs_count.get(vuln.bug_type, 0) + 1
+            unique_procedures = set(
+                (v.source_path, v.procedure_line) for v in vulnerabilities
+            )
 
             for procedure in unique_procedures:
                 process_vulnerabilities(ch, id, procedure, entrypoint, vulnerabilities)
 
-            with open(os.path.join(job_path, "old_bugs_count.json"), "w") as f:
-                f.write(json.dumps(bugs_count))
         else:
             msg = {
                 "id": id,
@@ -147,6 +165,7 @@ def process_vulnerabilities(
     data = {
         "id": id,
         "entrypoint": entrypoint,
+        "fixed_vulns": [vuln.bug_type for vuln in inherent_vulnerabilities],
         "source_path": source_path,
         "prompt": prompt,
         "procedure_line": procedure_line,
@@ -183,6 +202,7 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
         procedure_line: str = message["procedure_line"]
         response: str = message["response"]
         entrypoint: str = message["entrypoint"]
+        bugs_fixed: list[str] = message["fixed_vulns"]
 
         patch = ContextParser.get_patch(source_path, procedure_line, response)
 
@@ -209,16 +229,13 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
 
         vulnerabilities = run_infer_analyzer(patched_repository, entrypoint)
 
-        bugs_count = dict()
-
-        for vuln in vulnerabilities:
-            bugs_count[vuln.bug_type] = bugs_count.get(vuln.bug_type, 0) + 1
-
-        with open(
-            os.path.join(analysis_dir, f"{filename}_{procedure_line}_bugs_count.json"),
-            "w",
-        ) as f:
-            f.write(json.dumps(bugs_count))
+        save_bug_count_report(
+            os.path.join(
+                analysis_dir, f"patched_{filename}_{procedure_line}_bugs_count.json"
+            ),
+            "Patch that fixes: " + ", ".join(bugs_fixed),
+            vulnerabilities,
+        )
 
         shutil.rmtree(patched_repository)
 
