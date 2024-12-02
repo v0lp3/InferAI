@@ -21,7 +21,7 @@ services:
     environment:
       - TZ=Europe/Rome
       - RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/rabbitmq_password
-      - GROQ_TOKEN=/run/secrets/groq_token
+      - GROQ_TOKEN_FILE=/run/secrets/groq_token
     restart: on-failure
     depends_on:
       rabbitmq:

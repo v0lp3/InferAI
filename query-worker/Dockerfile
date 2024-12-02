@@ -1,7 +1,7 @@
 FROM python:slim
 
 
-RUN pip install -q -U google-generativeai
+RUN pip install -q -U groq httpx==0.27.2
 RUN pip install pika
 
 WORKDIR /query-worker
