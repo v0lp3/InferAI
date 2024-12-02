@@ -3,4 +3,3 @@ venv/*
 rabbitmq/*
 secrets/**
 storage/**
-rabbitmq.conf
