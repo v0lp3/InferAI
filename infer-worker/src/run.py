@@ -223,23 +223,26 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
             analysis_dir, f"repository_{filename}_{procedure_line}"
         )
 
-        shutil.copytree(repository_dir, patched_repository)
-        patched_source = source_path.replace(repository_dir, patched_repository)
+        try:
+            shutil.copytree(repository_dir, patched_repository)
+            patched_source = source_path.replace(repository_dir, patched_repository)
 
-        subprocess.run(["patch", source_path, "-o", patched_source, "-i", patches_path])
+            subprocess.run(["patch", source_path, "-o", patched_source, "-i", patches_path])
 
-        vulnerabilities = run_infer_analyzer(patched_repository, entrypoint)
+            vulnerabilities = run_infer_analyzer(patched_repository, entrypoint)
 
-        save_bug_count_report(
-            os.path.join(
-                analysis_dir, f"patched_{filename}_{procedure_line}_bugs_count.json"
-            ),
-            f"Patch for {filename} on procedure {procedure_line} that fixes: " + ", ".join(bugs_fixed),
-            vulnerabilities,
-        )
+            save_bug_count_report(
+                os.path.join(
+                    analysis_dir, f"patched_{filename}_{procedure_line}_bugs_count.json"
+                ),
+                f"Patch for {filename} on procedure {procedure_line} that fixes: " + ", ".join(bugs_fixed),
+                vulnerabilities,
+            )
 
-        shutil.rmtree(patched_repository)
-
+            shutil.rmtree(patched_repository)
+        except:
+            logging.error(f"Failed to create patch for {filename} on procedure {procedure_line}")
+            
     else:
         status_dir = os.path.join(analysis_dir, "status")
 
