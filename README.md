@@ -162,6 +162,10 @@ The enriched code is then passed to the LLM, which uses the additional context t
  }
 ```
 
+## Benchmarks
+
+You can find the benchmarks [here](./docs/benchmarks/README.md).
+
 ## Author
 
 - [Andrea Maugeri](https://github.com/v0lp3)
