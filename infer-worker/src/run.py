@@ -68,18 +68,18 @@ def analyze(
         return
 
     vulnerabilities = run_infer_analyzer(download_path, entrypoint, message)
-    if not vulnerabilities:
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-        return
+    
+    if len(vulnerabilities) > 0:
 
-    ContextParser.update_procedures_line(vulnerabilities)
-    unique_procedures = set(
-        (vuln.source_path, vuln.procedure_line) for vuln in vulnerabilities
-    )
-    if len(unique_procedures) > 0:
+        ContextParser.update_procedures_line(vulnerabilities)
+
+        unique_procedures = set(
+            (vuln.source_path, vuln.procedure_line) for vuln in vulnerabilities
+        )
 
         for procedure in unique_procedures:
             process_vulnerabilities(ch, id, procedure, vulnerabilities)
+
     else:
         msg = {
             "id": id,
