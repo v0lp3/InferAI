@@ -65,18 +65,23 @@ def analyze(
 
     else:
         vulnerabilities = run_infer_analyzer(download_path, entrypoint, message)
-        
+
         if len(vulnerabilities) > 0:
 
             ContextParser.update_procedures_line(vulnerabilities)
 
-            unique_procedures = set(
-                (vuln.source_path, vuln.procedure_line) for vuln in vulnerabilities
-            )
+            unique_procedures = set()
+            bugs_count = dict()
+
+            for vuln in vulnerabilities:
+                unique_procedures.add((vuln.source_path, vuln.procedure_line))
+                bugs_count[vuln.bug_type] = bugs_count.get(vuln.bug_type, 0) + 1
 
             for procedure in unique_procedures:
                 process_vulnerabilities(ch, id, procedure, vulnerabilities)
 
+            with open(os.path.join(download_path, "old_bugs_count.json"), "w") as f:
+                f.write(json.dumps(bugs_count))
         else:
             msg = {
                 "id": id,
