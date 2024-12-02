@@ -1,0 +1,27 @@
+--- test4/main.c
++++ test4/main.c
+@@ -1,10 +1,21 @@
+ #include <stdio.h>
+ 
+ void fn(char* buff) {
+-	for (int i = -1; i < 2048; i++) {
+-		buff[i] = 0x41;
+-	}
++    // Validate the buffer size to prevent buffer overflow
++    if (buff == NULL) {
++        return;  // or handle the error
++    }
++
++    // Ensure the buffer is large enough for the operation
++    const int expectedBufferSize = 2048;
++    assert(strlen(buff) >= expectedBufferSize);
++
++    // Initialize a loop variable with a valid index
++    for (int i = 0; i < 2048; i++) {
++        buff[i] = 0x41;  // Initialize the buffer with 'A'
++    }
+ }
++
+ 
+ int main () {
+ 	char buffer[1024] = {0};

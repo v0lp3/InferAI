@@ -93,7 +93,7 @@ def analyze(
 
             save_bug_count_report(
                 os.path.join(job_path, "original_bugs_count.json"),
-                "All original bugs found",
+                "Bugs in the original source code",
                 vulnerabilities,
             )
 

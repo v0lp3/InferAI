@@ -1,0 +1,23 @@
+--- test3/main.c
++++ test3/main.c
+@@ -2,7 +2,18 @@
+ 
+ int main () {
+ 
+-        char* test = malloc(-1);
+-        strcpy(test, "yoooooooo");
++    // Allocate memory with a valid size and check for NULL dereference
++    size_t size = strlen("yoooooooo") + 1; // calculate the size of the string + 1 for the null terminator
++    char* test = malloc(size);
+ 
++    if (test == NULL) {
++        // Handle memory allocation error
++        return -1;
++    }
++
++    // Use strcpy_s or strncpy to prevent buffer overrun
++    strncpy(test, "yoooooooo", size);
++    test[size - 1] = '\0'; // Ensure null termination
++    free(test);
+ }
++

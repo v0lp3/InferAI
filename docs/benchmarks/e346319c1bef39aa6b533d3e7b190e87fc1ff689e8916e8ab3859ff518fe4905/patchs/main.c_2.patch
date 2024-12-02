@@ -1,0 +1,21 @@
+--- test2/main.c
++++ test2/main.c
+@@ -1,8 +1,13 @@
+ #include <string.h>
+ 
+-int main () {
++int main() {
++    char* test = malloc(1024);
++    if (test == NULL) {
++        perror("Memory allocation failed");
++        return EXIT_FAILURE;
++    }
++    strncpy(test, "yoooooooo", 1024);
++    test[1023] = '\0'; // Ensure null-termination if source string is longer than buffer
++    return EXIT_SUCCESS;
++}
+ 
+-        char* test = malloc(1024);
+-        strcpy(test, "yoooooooo");
+-
+-}

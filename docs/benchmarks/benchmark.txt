@@ -1,0 +1,44 @@
+[*] Sending analysis task: test1
+[*] Downloading job[c6bc21b8d3b0bf1708925570cbe8b77fbe316e127de3440014ad9013ded2afa4] result
+[+] Job c6bc21b8d3b0bf1708925570cbe8b77fbe316e127de3440014ad9013ded2afa4 completed successfully:
+{'bugs': {'BUFFER_OVERRUN_L1': 1}, 'description': 'Bugs in the original source code'}
+{'bugs': {},
+ 'description': 'Patch for main.c on procedure 2 that fixes: BUFFER_OVERRUN_L1'}
+[*] Sending analysis task: test2
+[*] Downloading job[e346319c1bef39aa6b533d3e7b190e87fc1ff689e8916e8ab3859ff518fe4905] result
+[+] Job e346319c1bef39aa6b533d3e7b190e87fc1ff689e8916e8ab3859ff518fe4905 completed successfully:
+{'bugs': {'NULL_DEREFERENCE': 1}, 'description': 'Bugs in the original source code'}
+{'bugs': {},
+ 'description': 'Patch for main.c on procedure 2 that fixes: NULL_DEREFERENCE'}
+[*] Sending analysis task: test3
+[*] Downloading job[2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0] result
+[+] Job 2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0 completed successfully:
+{'bugs': {'BUFFER_OVERRUN_L1': 1,
+          'INFERBO_ALLOC_IS_BIG': 1,
+          'NULL_DEREFERENCE': 1},
+ 'description': 'Bugs in the original source code'}
+{'bugs': {},
+ 'description': 'Patch for main.c on procedure 2 that fixes: '
+                'BUFFER_OVERRUN_L1, NULL_DEREFERENCE, INFERBO_ALLOC_IS_BIG'}
+[*] Sending analysis task: test4
+[*] Downloading job[4a9ba5624e4ae8f2f729ef02d02d89107b2234652549bf9d3740b30b25b939f3] result
+[+] Job 4a9ba5624e4ae8f2f729ef02d02d89107b2234652549bf9d3740b30b25b939f3 completed successfully:
+{'bugs': {'BUFFER_OVERRUN_L2': 1}, 'description': 'Bugs in the original source code'}
+{'bugs': {},
+ 'description': 'Patch for main.c on procedure 2 that fixes: BUFFER_OVERRUN_L2'}
+[*] Sending analysis task: test5
+[*] Downloading job[4ed88871f9b9105c9871467e7848de3c6eb562c498742982d977feba066d4bd9] result
+[+] Job 4ed88871f9b9105c9871467e7848de3c6eb562c498742982d977feba066d4bd9 completed successfully:
+{'bugs': {'BUFFER_OVERRUN_L1': 1,
+          'BUFFER_OVERRUN_L2': 1,
+          'INFERBO_ALLOC_IS_BIG': 1,
+          'NULL_DEREFERENCE': 1},
+ 'description': 'Bugs in the original source code'}
+{'bugs': {'BUFFER_OVERRUN_L2': 1},
+ 'description': 'Patch for test.c on procedure 2 that fixes: '
+                'BUFFER_OVERRUN_L1, NULL_DEREFERENCE, INFERBO_ALLOC_IS_BIG'}
+{'bugs': {'BUFFER_OVERRUN_L1': 1,
+          'BUFFER_OVERRUN_L2': 1,
+          'INFERBO_ALLOC_IS_BIG': 1,
+          'NULL_DEREFERENCE': 1},
+ 'description': 'Patch for main.c on procedure 3 that fixes: BUFFER_OVERRUN_L2'}

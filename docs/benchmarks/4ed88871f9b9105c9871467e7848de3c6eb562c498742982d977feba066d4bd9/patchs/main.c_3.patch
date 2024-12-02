@@ -1,0 +1,29 @@
+--- test5/main.c
++++ test5/main.c
+@@ -2,10 +2,23 @@
+ #include "test.c"
+ 
+ void fn(char* buff) {
+-	for (int i = -1; i < 2048; i++) {
+-		buff[i] = 0x41;
+-	}
++    // Ensurebuff is not NULL and is large enough to hold the data
++    if (buff == NULL || 2048 <= 0) {
++        return;
++    }
++    
++    // Use size_t for indexing to prevent overflow
++    for (size_t i = 0; i < (size_t)2048; i++) {
++        if (i < strlen(buff)) {
++            buff[i] = 0x41;
++        } else if (i < 2048 && i < sizeof(buff)) {
++            buff[i] = 0x41;
++        } else {
++            break;
++        }
++    }
+ }
++
+ 
+ int main () {
+ 	char buffer[1024] = {0};

@@ -1,0 +1,36 @@
+--- test5/test.c
++++ test5/test.c
+@@ -1,8 +1,31 @@
+ #include <stdlib.h>
+ 
+ void test() {
+-	char* str = malloc(-1);
++    // Allocate memory for a string with a specified size
++    size_t len = 50;
++    char* str = malloc(len * sizeof(char));
+ 
+-	printf("%c", str[5]);
++    // Check if the memory allocation was successful
++    if (str == NULL) {
++        printf("Memory allocation failed\n");
++        return;
++    }
+ 
++    // Initialize the string to prevent buffer overruns
++    for (size_t i = 0; i < len; i++) {
++        str[i] = '\0';
++    }
++
++    // Check if the index is within the bounds of the string
++    size_t index = 5;
++    if (index < len) {
++        // Print the character at the specified index
++        printf("%c", str[index]);
++    } else {
++        printf("Index out of bounds\n");
++    }
++
++    // Don't forget to free the allocated memory
++    free(str);
+ }
++

@@ -1,0 +1,29 @@
+--- test1/main.c
++++ test1/main.c
+@@ -1,7 +1,25 @@
+ #include <stdio.h>
+ 
++/**
++ * Improved version of the main function.
++ *
++ * Fixes:
++ *  - BUFFER_OVERRUN_L1: Offset: 26 Size: 25. 
++ *    Accessing 'a[26]' is outside the array bounds.
++ *
++ * @return int
++ */
+ int main () { 
+ 	char a[25] = {0};
+ 
+-	printf("%c", a[26]);
++// Improved safe version
++// Check array bounds before accessing
++   if (26 < 25) {
++       printf("Index 26 is within array bounds.\n");
++       printf("%c", a[26]);
++   } else {
++       printf("Error: Index 26 is out of array bounds.\n");
++       return -1;
++   }
+ }
++
