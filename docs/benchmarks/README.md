@@ -18,7 +18,7 @@ The log was generated using the script `benchmark.py`, which is located within t
 [+] Job e346319c1bef39aa6b533d3e7b190e87fc1ff689e8916e8ab3859ff518fe4905 completed successfully:
 {'bugs': {'NULL_DEREFERENCE': 1}, 'description': 'Bugs in the original source code'}
 {'bugs': {},
- 'description': 'Patch for main.c on procedure 2 that fixes: NULL_DEREFERENCE'}
+ 'description': 'Patch for main.c on procedure 2 that fixes: NULL_DEREFERENCE - Compilation failed!'}
 [*] Sending analysis task: test3
 [*] Downloading job[2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0] result
 [+] Job 2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0 completed successfully:
