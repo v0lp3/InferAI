@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import subprocess
+import shutil
 
 import git
 
@@ -47,7 +49,8 @@ def analyze(
         message["entrypoint"],
         message["repository"],
     )
-    download_path = os.path.join("/tmp", "storage", id, "repository")
+    job_path = os.path.join("/tmp", "storage", id)
+    download_path = os.path.join(job_path, "repository")
 
     os.makedirs(download_path, exist_ok=True)
 
@@ -64,9 +67,9 @@ def analyze(
         )
 
     else:
-        vulnerabilities = run_infer_analyzer(download_path, entrypoint, message)
+        vulnerabilities = run_infer_analyzer(download_path, entrypoint)
 
-        if len(vulnerabilities) > 0:
+        if vulnerabilities:
 
             ContextParser.update_procedures_line(vulnerabilities)
 
@@ -78,9 +81,9 @@ def analyze(
                 bugs_count[vuln.bug_type] = bugs_count.get(vuln.bug_type, 0) + 1
 
             for procedure in unique_procedures:
-                process_vulnerabilities(ch, id, procedure, vulnerabilities)
+                process_vulnerabilities(ch, id, procedure, entrypoint, vulnerabilities)
 
-            with open(os.path.join(download_path, "old_bugs_count.json"), "w") as f:
+            with open(os.path.join(job_path, "old_bugs_count.json"), "w") as f:
                 f.write(json.dumps(bugs_count))
         else:
             msg = {
@@ -107,19 +110,21 @@ def clone_repository(repository: str, download_path: str, message: dict) -> bool
         return False
 
 
-def run_infer_analyzer(
-    download_path: str, entrypoint: str, message: dict
-) -> list[InferReport]:
+def run_infer_analyzer(download_path: str, entrypoint: str) -> list[InferReport]:
     """Run the Infer analyzer and return the vulnerabilities detected."""
     try:
         return Infer.run_analyzer(download_path, entrypoint)
     except Exception as e:
-        logging.error(f"Failed to analyze {message}, {e}")
+        logging.error(f"Failed to analyze {download_path}/{entrypoint}, {e}")
         return []
 
 
 def process_vulnerabilities(
-    ch: Channel, id: str, procedure: tuple, vulnerabilities: list[InferReport]
+    ch: Channel,
+    id: str,
+    procedure: tuple,
+    entrypoint,
+    vulnerabilities: list[InferReport],
 ) -> None:
     """Process and publish vulnerabilities grouped by procedure."""
     source_path, procedure_line = procedure
@@ -141,6 +146,7 @@ def process_vulnerabilities(
 
     data = {
         "id": id,
+        "entrypoint": entrypoint,
         "source_path": source_path,
         "prompt": prompt,
         "procedure_line": procedure_line,
@@ -176,6 +182,7 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
         source_path: str = message["source_path"]
         procedure_line: str = message["procedure_line"]
         response: str = message["response"]
+        entrypoint: str = message["entrypoint"]
 
         patch = ContextParser.get_patch(source_path, procedure_line, response)
 
@@ -189,6 +196,32 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
 
         with open(patches_path, "w") as f:
             f.write(patch)
+
+        repository_dir = os.path.join(analysis_dir, "repository")
+        patched_repository = os.path.join(
+            analysis_dir, f"repository_{filename}_{procedure_line}"
+        )
+
+        shutil.copytree(repository_dir, patched_repository)
+        patched_source = source_path.replace(repository_dir, patched_repository)
+
+        subprocess.run(["patch", source_path, "-o", patched_source, "-i", patches_path])
+
+        vulnerabilities = run_infer_analyzer(patched_repository, entrypoint)
+
+        bugs_count = dict()
+
+        for vuln in vulnerabilities:
+            bugs_count[vuln.bug_type] = bugs_count.get(vuln.bug_type, 0) + 1
+
+        with open(
+            os.path.join(analysis_dir, f"{filename}_{procedure_line}_bugs_count.json"),
+            "w",
+        ) as f:
+            f.write(json.dumps(bugs_count))
+
+        shutil.rmtree(patched_repository)
+
     else:
         status_dir = os.path.join(analysis_dir, "status")
 

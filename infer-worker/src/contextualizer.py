@@ -152,4 +152,5 @@ class ContextParser:
                 fromfile=source_path,
                 tofile=source_path,
             )
+
             return "".join(patch)

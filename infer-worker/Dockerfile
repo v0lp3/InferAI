@@ -13,7 +13,8 @@ RUN apt-get update && \
       python3-pip \
       gcc \
       git \
-      openssh-client
+      openssh-client \
+      patch
 
 RUN INFER_VERSION=v1.1.0; \
     cd /opt && \
