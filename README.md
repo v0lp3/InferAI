@@ -29,7 +29,7 @@ The workflow is as follows:
 A user initiates a job through the frontend. The job is defined by an ID, the repository link to analyze, and the code entry point. This information is sent to the Infer-worker via the analyze-jobs queue.
 
 2. **Code Analysis**:
-Infer-worker processes the job by analyzing the code with the Infer Static Analyzer. Vulnerabilities are grouped by functions, and the code is enriched with contextual comments for the LLM (as illustrated below). The library used for source code manipulation is Tree-sitter. Each vulnerable function is sent to the Query-worker through the query-jobs queue.
+Infer-worker processes the job by analyzing the code with the Infer Static Analyzer. Vulnerabilities are grouped by functions, and the code is enriched with contextual comments for the LLM (as illustrated below). The library used for source code manipulation is [tree-sitter](https://github.com/tree-sitter/tree-sitter). Each vulnerable function is sent to the Query-worker through the query-jobs queue.
 
 3. **Code fix generation**:
 Query-worker processes incoming messages and manages rate limit errors. The LLM response generates a patched version of the vulnerable function, which is forwarded to the patch-jobs queue, handled by the Infer-worker.
