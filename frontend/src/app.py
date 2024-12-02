@@ -79,7 +79,7 @@ def analyze() -> Response:
 
     token: str = jwt.encode({"ids": ids}, app.secret_key, algorithm="HS256")
 
-    resp: Response = make_response("Done", 200)
+    resp: Response = make_response(f"Done. Job: {id}", 200)
     resp.set_cookie("token", token)
 
     try:
@@ -123,6 +123,7 @@ def view() -> Response:
         return render_template("patchs.html", patchs=ids)
 
     id: str = request.form.get("id")
+    only_bug_changelog: bool = bool(request.form.get("only_bug_changelog"))
 
     if id not in ids:
         return "Invalid request", 400
@@ -132,18 +133,28 @@ def view() -> Response:
     status_path = os.path.join(job_path, "status")
 
     if os.path.exists(patchs_path):
+        json_files_path = [
+            os.path.realpath(os.path.join(job_path, file))
+            for file in os.listdir(job_path)
+            if file.endswith(".json")
+        ]
+
+        if only_bug_changelog:
+            changelogs = []
+
+            for file in json_files_path:
+                with open(file) as f:
+                    changelogs += [json.load(f)]
+
+            return changelogs, 200
+
         timestamp = int(time())
         output_file = os.path.join("/tmp", f"patchs_{id}_{timestamp}.zip")
 
         try:
             with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
-
-                for file in os.listdir(job_path):
-                    if file.endswith(".json"):
-                        zipf.write(
-                            os.path.realpath(os.path.join(job_path, file)),
-                            arcname=file,
-                        )
+                for file in json_files_path:
+                    zipf.write(file, arcname=os.path.basename(file))
 
                 for root, _, files in os.walk(patchs_path):
                     for file in files:
@@ -161,7 +172,7 @@ def view() -> Response:
         with open(status_path) as f:
             return f.read(), 200
 
-    return "Analysis in progress", 200
+    return "Analysis in progress", 202
 
 
 logging.basicConfig(

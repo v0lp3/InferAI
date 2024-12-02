@@ -38,10 +38,11 @@ def save_bug_count_report(
     bugs_report["description"] = description
     bugs_report["bugs"] = dict()
 
-    for vuln in vulnerabilities:
-        bugs_report["bugs"][vuln.bug_type] = (
-            bugs_report["bugs"].get(vuln.bug_type, 0) + 1
-        )
+    if vulnerabilities:
+        for vuln in vulnerabilities:
+            bugs_report["bugs"][vuln.bug_type] = (
+                bugs_report["bugs"].get(vuln.bug_type, 0) + 1
+            )
 
     with open(path, "w") as f:
         f.write(json.dumps(bugs_report))
@@ -233,7 +234,7 @@ def create_patch(ch: Channel, method: Basic.Deliver, _: BasicProperties, body: b
             os.path.join(
                 analysis_dir, f"patched_{filename}_{procedure_line}_bugs_count.json"
             ),
-            "Patch that fixes: " + ", ".join(bugs_fixed),
+            f"Patch for {filename} on procedure {procedure_line} that fixes: " + ", ".join(bugs_fixed),
             vulnerabilities,
         )
 
