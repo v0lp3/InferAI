@@ -20,6 +20,7 @@ from definitions import (
     RABBITMQ_CREDENTIALS,
     STATUS_NO_VULN_FOUND,
     STATUS_REPO_NOT_FOUND,
+    STATUS_COMPILATION_FAILED,
     STATUS_OK,
 )
 from infer import Infer, InferReport
@@ -38,11 +39,13 @@ def save_bug_count_report(
     bugs_report["description"] = description
     bugs_report["bugs"] = dict()
 
-    if vulnerabilities:
+    if vulnerabilities != None:
         for vuln in vulnerabilities:
             bugs_report["bugs"][vuln.bug_type] = (
                 bugs_report["bugs"].get(vuln.bug_type, 0) + 1
             )
+    else:
+        bugs_report["description"] += " - Compilation failed!"
 
     with open(path, "w") as f:
         f.write(json.dumps(bugs_report))
@@ -87,7 +90,7 @@ def analyze(
     else:
         vulnerabilities = run_infer_analyzer(download_path, entrypoint)
 
-        if vulnerabilities:
+        if vulnerabilities != None and len(vulnerabilities) > 0:
 
             ContextParser.update_procedures_line(vulnerabilities)
 
@@ -103,12 +106,15 @@ def analyze(
 
             for procedure in unique_procedures:
                 process_vulnerabilities(ch, id, procedure, entrypoint, vulnerabilities)
-
         else:
             msg = {
                 "id": id,
-                "status": STATUS_NO_VULN_FOUND,
             }
+
+            if len(vulnerabilities) == 0:
+                msg["status"] = STATUS_NO_VULN_FOUND
+            else:
+                msg["status"] = STATUS_COMPILATION_FAILED
 
             ch.basic_publish(
                 routing_key="patch-jobs",
@@ -135,7 +141,7 @@ def run_infer_analyzer(download_path: str, entrypoint: str) -> list[InferReport]
         return Infer.run_analyzer(download_path, entrypoint)
     except Exception as e:
         logging.error(f"Failed to analyze {download_path}/{entrypoint}, {e}")
-        return []
+        return None
 
 
 def process_vulnerabilities(

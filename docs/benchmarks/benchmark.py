@@ -18,6 +18,7 @@ REPO_URL = "https://github.com/krosspile/test_repo.git"
 # Session for HTTP requests
 session = requests.Session()
 
+
 def send_analysis_task(entrypoint: str):
     """
     Send an analysis task to the server.
@@ -40,6 +41,7 @@ def send_analysis_task(entrypoint: str):
     except requests.RequestException as e:
         print(f"[!] Failed to send task for {entrypoint}: {e}")
         return None
+
 
 def download_job_result(job_id: str):
     """
@@ -65,6 +67,11 @@ def download_job_result(job_id: str):
             elif response.text == "404":
                 print(f"[!] Repo not found for job {job_id}")
                 return
+
+            elif response.text == "500":
+                print(f"[!] Failed to compile for {job_id}")
+                return
+
             elif response.status_code == 200:
                 print(f"[+] Job {job_id} completed successfully:")
                 data = response.json()
@@ -77,6 +84,7 @@ def download_job_result(job_id: str):
 
         sleep(5)
 
+
 def main():
     """
     Main function to send tasks and fetch their results.
@@ -86,6 +94,7 @@ def main():
         if job_id:
             sleep(10)  # Delay before checking the result
             download_job_result(job_id)
+
 
 if __name__ == "__main__":
     main()

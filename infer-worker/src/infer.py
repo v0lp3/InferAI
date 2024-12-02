@@ -46,12 +46,13 @@ class Infer:
             shell=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            check=True,
         )
 
         report_path = os.path.join(source_path, "infer-out", "report.json")
 
         if not os.path.exists(report_path):
-            return None
+            return []
 
         with open(report_path) as f:
             full_report = json.load(f)
