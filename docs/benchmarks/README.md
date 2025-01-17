@@ -13,12 +13,22 @@ The log was generated using the script `benchmark.py`, which is located within t
 {'bugs': {'BUFFER_OVERRUN_L1': 1}, 'description': 'Bugs in the original source code'}
 {'bugs': {},
  'description': 'Patch for main.c on procedure 2 that fixes: BUFFER_OVERRUN_L1'}
+```
+
+✅ test1 passed 
+
+```
 [*] Sending analysis task: test2
 [*] Downloading job[e346319c1bef39aa6b533d3e7b190e87fc1ff689e8916e8ab3859ff518fe4905] result
 [+] Job e346319c1bef39aa6b533d3e7b190e87fc1ff689e8916e8ab3859ff518fe4905 completed successfully:
 {'bugs': {'NULL_DEREFERENCE': 1}, 'description': 'Bugs in the original source code'}
 {'bugs': {},
  'description': 'Patch for main.c on procedure 2 that fixes: NULL_DEREFERENCE - Compilation failed!'}
+```
+
+❌ test2 failed
+
+```
 [*] Sending analysis task: test3
 [*] Downloading job[2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0] result
 [+] Job 2f269bd63281d5e08486a42e2631b4088eb1140ff231cf94a5d54e46105d74f0 completed successfully:
@@ -29,12 +39,22 @@ The log was generated using the script `benchmark.py`, which is located within t
 {'bugs': {},
  'description': 'Patch for main.c on procedure 2 that fixes: '
                 'BUFFER_OVERRUN_L1, NULL_DEREFERENCE, INFERBO_ALLOC_IS_BIG'}
+```
+
+✅ test3 passed
+
+```
 [*] Sending analysis task: test4
 [*] Downloading job[4a9ba5624e4ae8f2f729ef02d02d89107b2234652549bf9d3740b30b25b939f3] result
 [+] Job 4a9ba5624e4ae8f2f729ef02d02d89107b2234652549bf9d3740b30b25b939f3 completed successfully:
 {'bugs': {'BUFFER_OVERRUN_L2': 1}, 'description': 'Bugs in the original source code'}
 {'bugs': {},
  'description': 'Patch for main.c on procedure 2 that fixes: BUFFER_OVERRUN_L2'}
+```
+
+✅ test4 passed
+
+```
 [*] Sending analysis task: test5
 [*] Downloading job[4ed88871f9b9105c9871467e7848de3c6eb562c498742982d977feba066d4bd9] result
 [+] Job 4ed88871f9b9105c9871467e7848de3c6eb562c498742982d977feba066d4bd9 completed successfully:
@@ -52,3 +72,5 @@ The log was generated using the script `benchmark.py`, which is located within t
           'NULL_DEREFERENCE': 1},
  'description': 'Patch for main.c on procedure 3 that fixes: BUFFER_OVERRUN_L2'}
 ```
+
+✅ test5 passed
