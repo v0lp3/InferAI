@@ -46,6 +46,34 @@ Users can download the processed results through the frontend.
 > A database could be introduced to track users and their jobs more effectively.
 > Currently, the frontend manages user sessions and analyzed files with a simple JWT token.
 
+```mermaid
+sequenceDiagram
+    title Vulnerability Analysis and Patching Workflow
+    Client->>Frontend: POST /analyze
+    Frontend->>Infer-Worker: Publish job
+    Frontend-->>Client: JWT token
+
+    Infer-Worker->>Repository: Request repository
+    Repository-->>Infer-Worker: Repository
+    Infer-Worker->>Infer: Analyze repository from given entrypoint
+    Infer-->>Infer-Worker: Vulnerability report
+
+    Infer-Worker->>Infer-Worker: Parse report and apply comments to each vulnerable function\nGroup vulnerabilities for each function
+    Note over Infer-Worker: One job for each vulnerable function
+    Infer-Worker->>Query-Worker: Publish job for patch suggestions
+
+    Query-Worker->>LLM: Query LLM API with enhanced context
+    LLM-->>Query-Worker: Returns patched function
+    Query-Worker-->>Infer-Worker: Publish job with patch suggestions
+
+    Infer-Worker->>Infer: Re-analyze repository with applied patch
+    Infer-->>Infer-Worker: Updated vulnerability report
+
+    Client->>Frontend: POST /patch
+    Frontend-->>Client: Return zip containing patched repository
+
+```
+
 ## Installation
 
 To set up and run InferAI, follow these steps:
